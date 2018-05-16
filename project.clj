@@ -1,9 +1,12 @@
 (defproject com.jeaye/easy-pack "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.8.0"]]
+  :description ""
+  :url ""
+  :license {:name "jank license"
+            :url "https://upload.jeaye.com/jank-license"}
+  :dependencies [[org.clojure/clojure "1.9.0"]]
   :main ^:skip-aot com.jeaye.easy-pack
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:dev {:global-vars {*warn-on-reflection* true
+                                 *assert* true}}
+             :uberjar {:aot :all
+                       :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}})

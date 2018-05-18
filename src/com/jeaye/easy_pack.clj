@@ -15,8 +15,7 @@
 (defn -main [& args]
   (let [images (mapv img/load-image args)
         full-width (reduce #(+ %1 (img/width %2)) 0 images)
-        full-height (apply max (map img/height images))
+        full-height (apply max 0 (map img/height images))
         output-image (img/new-image full-width full-height)]
-    (println full-width "x" full-height)
     (copy-pixels! output-image images)
-    (img/show output-image)))
+    output-image))

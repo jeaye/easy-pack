@@ -31,5 +31,6 @@
 
 ; --outputs png,css,json,edn
 (defn -main [& args]
-  (let [image-infos (mapv load-image! args)]
-    (combine! image-infos)))
+  (let [image-infos (mapv load-image! args)
+        output (combine! image-infos)]
+    (img/save (:image output) "output.png" :quality 1.0 :progressive nil)))

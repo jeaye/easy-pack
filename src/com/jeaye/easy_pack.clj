@@ -2,20 +2,34 @@
   (:gen-class)
   (:require [mikera.image.core :as img]))
 
-(defn copy-pixels! [output-image images]
-  (loop [imgs images
-         x 0]
-    (when-let [img (first imgs)]
-      (let [img-width (img/width img)
-            img-height (img/height img)
-            sub-output (img/sub-image output-image x 0 img-width img-height)]
-        (img/set-pixels sub-output (img/get-pixels img))
-        (recur (rest imgs) (+ x img-width))))))
+(defn load-image! [path]
+  {:image (img/load-image path)
+   :path path})
 
+(defn combine! [image-infos]
+  (let [full-width (reduce #(+ %1 (-> %2 :image img/width)) 0 image-infos)
+        full-height (apply max 0 (map #(-> % :image img/height) image-infos))
+        output-image (img/new-image full-width full-height)
+        positions (loop [infos image-infos
+                         x 0
+                         positions {}]
+                    (if-let [info (first infos)]
+                      (let [{:keys [image path]} info
+                            img-width (img/width image)
+                            img-height (img/height image)
+                            sub-output (img/sub-image output-image x 0 img-width img-height)]
+                        (img/set-pixels sub-output (img/get-pixels image))
+                        (recur (rest infos)
+                               (+ x img-width)
+                               (assoc positions path {:width img-width
+                                                      :height img-height
+                                                      :x x
+                                                      :y 0})))
+                      positions))]
+    {:image output-image
+     :positions positions}))
+
+; --outputs png,css,json,edn
 (defn -main [& args]
-  (let [images (mapv img/load-image args)
-        full-width (reduce #(+ %1 (img/width %2)) 0 images)
-        full-height (apply max 0 (map img/height images))
-        output-image (img/new-image full-width full-height)]
-    (copy-pixels! output-image images)
-    output-image))
+  (let [image-infos (mapv load-image! args)]
+    (combine! image-infos)))

@@ -9,27 +9,29 @@
   {:image (img/load-image path)
    :path path})
 
+(defn build-layout [image-infos]
+  (loop [infos image-infos
+         x 0
+         acc {}]
+    (if-let [info (first infos)]
+      (let [{:keys [image path]} info
+            img-width (img/width image)
+            img-height (img/height image)]
+        (recur (rest infos)
+               (+ x img-width)
+               (assoc acc path {:image image
+                                :width img-width
+                                :height img-height
+                                :x x
+                                :y 0})))
+      acc)))
+
 (defn combine! [output-fns image-infos]
   (let [full-width (reduce #(+ %1 (-> %2 :image img/width)) 0 image-infos)
-        full-height (apply max 0 (map #(-> % :image img/height) image-infos))
-        images (loop [infos image-infos
-                      x 0
-                      acc {}]
-                 (if-let [info (first infos)]
-                   (let [{:keys [image path]} info
-                         img-width (img/width image)
-                         img-height (img/height image)]
-                     (recur (rest infos)
-                            (+ x img-width)
-                            (assoc acc path {:image image
-                                             :width img-width
-                                             :height img-height
-                                             :x x
-                                             :y 0})))
-                   acc))]
+        full-height (apply max 0 (map #(-> % :image img/height) image-infos))]
     {:width full-width
      :height full-height
-     :images images}))
+     :layout (build-layout image-infos)}))
 
 ; --outputs png,css,json,edn
 (defn -main [& args]

@@ -12,6 +12,7 @@
 (defn build-layout [image-infos]
   (loop [infos image-infos
          x 0
+         y 0
          acc {:width 0
               :height 0
               :layout {}}]
@@ -21,6 +22,7 @@
             img-height (img/height image)]
         (recur (rest infos)
                (+ x img-width)
+               y
                (-> acc
                    (update :width + img-width)
                    (update :height max img-height)
@@ -28,7 +30,7 @@
                                              :width img-width
                                              :height img-height
                                              :x x
-                                             :y 0}))))
+                                             :y y}))))
       acc)))
 
 ; --outputs png,css,json,edn

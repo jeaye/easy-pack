@@ -15,7 +15,7 @@
          y 0
          acc {:width 0
               :height 0
-              :layout {}}]
+              :images []}]
     (if-let [info (first infos)]
       (let [{:keys [image path]} info
             img-width (img/width image)
@@ -26,16 +26,24 @@
                (-> acc
                    (update :width + img-width)
                    (update :height max img-height)
-                   (assoc-in [:layout path] {:image image
-                                             :width img-width
-                                             :height img-height
-                                             :x x
-                                             :y y}))))
+                   (update :images conj {:image image
+                                         :path path
+                                         :width img-width
+                                         :height img-height
+                                         :x x
+                                         :y y}))))
       acc)))
+
+(defn generate-outputs [layout output-fns]
+  (reduce (fn [acc output-fn]
+            (merge acc (output-fn acc)))
+          layout
+          output-fns))
 
 ; --outputs png,css,json,edn
 (defn -main [& args]
   (let [image-infos (mapv load-image! args)
         output-fns [image/output css/output]
         layout (build-layout image-infos)]
-    (img/save (:image output) "output.png" :quality 1.0 :progressive nil)))
+    layout
+    #_(img/save (:image output) "output.png" :quality 1.0 :progressive nil)))

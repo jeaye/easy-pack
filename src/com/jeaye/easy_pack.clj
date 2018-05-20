@@ -12,7 +12,9 @@
 (defn build-layout [image-infos]
   (loop [infos image-infos
          x 0
-         acc {:layout {}}]
+         acc {:width 0
+              :height 0
+              :layout {}}]
     (if-let [info (first infos)]
       (let [{:keys [image path]} info
             img-width (img/width image)

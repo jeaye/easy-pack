@@ -1,6 +1,7 @@
 (ns com.jeaye.easy-pack
   (:gen-class)
   (:require [mikera.image.core :as img]
+            [me.raynes.fs :as fs]
             [com.jeaye.easy-pack.output
              [image :as image]
              [css :as css]]))
@@ -42,7 +43,9 @@
 
 ; --outputs png,css,json,edn
 (defn -main [& args]
-  (let [image-infos (mapv load-image! args)
+  (let [image-infos (->> (mapv fs/absolute args)
+                         distinct
+                         (mapv load-image!))
         output-fns [image/output css/output]
         save-fns [image/save! css/save!]
         layout (build-layout image-infos)

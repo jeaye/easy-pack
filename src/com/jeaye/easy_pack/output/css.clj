@@ -7,7 +7,10 @@
 (def base-output (str base-class " {}\n"))
 
 (defn build-class-name [image]
-  (let [base-path (fs/base-name (:path image) true)]
+  (let [base-path (->> (fs/base-name (:path image) true)
+                       ; https://stackoverflow.com/questions/448981/which-characters-are-valid-in-css-class-names-selectors#449000
+                       (filter #(re-matches #"[_a-zA-Z0-9-]" (str %)))
+                       (apply str))]
     (str base-class "-" base-path)))
 
 (defn image->css [image]

@@ -36,7 +36,7 @@
 
 (defn generate-outputs [layout output-fns]
   (reduce (fn [acc output-fn]
-            (merge acc (output-fn acc)))
+            (output-fn acc))
           layout
           output-fns))
 
@@ -44,6 +44,9 @@
 (defn -main [& args]
   (let [image-infos (mapv load-image! args)
         output-fns [image/output css/output]
-        layout (build-layout image-infos)]
-    layout
-    #_(img/save (:image output) "output.png" :quality 1.0 :progressive nil)))
+        save-fns [image/save! css/save!]
+        layout (build-layout image-infos)
+        with-outputs (generate-outputs layout output-fns)]
+    (doseq [save-fn! save-fns]
+      (save-fn! with-outputs))
+    with-outputs))

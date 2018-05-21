@@ -48,8 +48,8 @@
                          (mapv load-image!))
         output-fns [image/output css/output]
         save-fns [image/save! css/save!]
-        layout (build-layout image-infos)
-        with-outputs (generate-outputs layout output-fns)]
+        layout (-> (build-layout image-infos)
+                   (generate-outputs layout output-fns))]
     (doseq [save-fn! save-fns]
-      (save-fn! with-outputs))
-    with-outputs))
+      (save-fn! layout))
+    layout))

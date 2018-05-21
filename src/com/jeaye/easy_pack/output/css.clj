@@ -2,6 +2,8 @@
   (:require [me.raynes.fs :as fs]))
 
 (def base-class ".icon")
+; TODO: Base image url
+; background-image: url({% asset sprite-sheet.png @path %}) !important;
 (def base-output (str base-class " {}\n"))
 
 (defn build-class-name [image]
@@ -25,4 +27,5 @@
     (-> (assoc layout :images images)
         (assoc-in [:output :css] (build images)))))
 
-(defn save! [layout])
+(defn save! [layout]
+  (spit "output.css" (get-in layout [:output :css])))

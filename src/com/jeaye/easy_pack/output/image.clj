@@ -10,6 +10,7 @@
 
 (defn save! [layout]
   (img/save (get-in layout [:output :image])
+            ; TODO: Configure output file
             "output.png"
             :quality 1.0
             :progressive nil))

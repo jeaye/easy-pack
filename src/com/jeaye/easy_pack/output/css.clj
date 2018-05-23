@@ -1,6 +1,7 @@
 (ns com.jeaye.easy-pack.output.css
   (:require [me.raynes.fs :as fs]))
 
+; TODO: Configure class
 (def base-class ".icon")
 ; TODO: Base image url
 ; background-image: url({% asset sprite-sheet.png @path %}) !important;
@@ -31,4 +32,5 @@
         (assoc-in [:output :css] (build images)))))
 
 (defn save! [layout]
+  ; TODO: Configure output file
   (spit "output.css" (get-in layout [:output :css])))

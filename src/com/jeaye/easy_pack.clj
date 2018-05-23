@@ -2,6 +2,8 @@
   (:gen-class)
   (:require [mikera.image.core :as img]
             [me.raynes.fs :as fs]
+            [com.jeaye.easy-pack
+             [cli :as cli]]
             [com.jeaye.easy-pack.output
              [image :as image]
              [css :as css]]))
@@ -42,14 +44,20 @@
           output-fns))
 
 ; --outputs png,css,json,edn
-(defn -main [& args]
+(defn TODO [args]
   (let [image-infos (->> (mapv fs/absolute args)
                          distinct
                          (mapv load-image!))
         output-fns [image/output css/output]
         save-fns [image/save! css/save!]
         layout (-> (build-layout image-infos)
-                   (generate-outputs layout output-fns))]
+                   (generate-outputs output-fns))]
     (doseq [save-fn! save-fns]
       (save-fn! layout))
     layout))
+
+(defn -main [& args]
+  (let [{:keys [options exit-message ok?]}  (cli/parse args)]
+    (if (some? exit-message)
+      (cli/exit! (if ok? 0 1) exit-message)
+      options)))

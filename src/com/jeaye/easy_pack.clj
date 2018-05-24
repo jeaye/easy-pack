@@ -55,8 +55,8 @@
       (save-fn! layout))
     layout))
 
-(defn -main [& args]
-  (let [{:keys [options exit-message ok?]}  (cli/parse args)]
+(defn -main [path & args]
+  (let [{:keys [options exit-message ok?]}  (cli/parse path args)]
     (if (some? exit-message)
       (cli/exit! (if ok? 0 1) exit-message)
       ; TODO: bind options to dynamic var and run primary logic

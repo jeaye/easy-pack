@@ -37,8 +37,8 @@
     :assoc-fn (fn [m k _] (update-in m [k] inc))]
    ["-h" "--help"]])
 
-(defn usage [summary]
-  (->> ["Usage: easy-pack outputs [options]"
+(defn usage [path summary]
+  (->> [(str "Usage: " path " outputs [options]")
         ""
         "Options:"
         summary]
@@ -47,17 +47,17 @@
 (defn error-message [errors]
   (string/join \newline errors))
 
-(defn parse [cli-args]
+(defn parse [path cli-args]
   (let [{:keys [options args errors summary]} (parse-opts cli-args cli-options)]
     (cond
       (:help options)
-      {:exit-message (usage summary) :ok? true}
+      {:exit-message (usage path summary) :ok? true}
 
       errors
       {:exit-message (error-message errors) :ok? false}
 
       (-> options :outputs empty?)
-      {:exit-message (usage summary) :ok? false}
+      {:exit-message (usage path summary) :ok? false}
 
       :else
       {:options options})))

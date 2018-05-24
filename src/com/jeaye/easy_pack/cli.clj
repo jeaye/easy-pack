@@ -24,6 +24,7 @@
     :validate [#(s/valid? ::outputs %) (str "Invalid outputs. Valid outputs are: "
                                             (->> (map name valid-outputs)
                                                  (string/join ",")))]]
+   ; TODO: fn for generating these output file opts?
    [nil "--png-file FILE" "Output PNG file"
     :default "easy-pack.png"
     :validate [valid-output-file? "Invalid PNG output file"]]

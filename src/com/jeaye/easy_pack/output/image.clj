@@ -1,5 +1,7 @@
 (ns com.jeaye.easy-pack.output.image
-  (:require [mikera.image.core :as img]))
+  (:require [mikera.image.core :as img]
+            [com.jeaye.easy-pack
+             [cli :as cli]]))
 
 (defn output [layout]
   (let [output-image (img/new-image (:width layout) (:height layout))]
@@ -10,7 +12,6 @@
 
 (defn save! [layout]
   (img/save (get-in layout [:output :image])
-            ; TODO: Configure output file
-            "output.png"
-            :quality 1.0
+            (:image-file cli/*options*)
+            :quality 1.0 ; TODO: cli option
             :progressive nil))

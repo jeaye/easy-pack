@@ -43,21 +43,27 @@
           layout
           output-fns))
 
-(defn TODO [args]
-  (let [image-infos (->> (mapv fs/absolute args)
+(def output->fns {:png {:output (partial image/output :png)
+                        :save (partial image/save! :png)}
+                  :css {:output css/output
+                        :save css/save!}})
+
+(defn pack! []
+  (let [image-infos (->> (:inputs cli/*options*)
+                         (mapv fs/absolute)
                          distinct
                          (mapv load-image!))
-        output-fns [image/output css/output]
-        save-fns [image/save! css/save!]
+        output-fns (map output->fns (:outputs cli/*options*))
         layout (-> (build-layout image-infos)
-                   (generate-outputs output-fns))]
-    (doseq [save-fn! save-fns]
+                   (generate-outputs (map :output output-fns)))]
+    (doseq [save-fn! (map :save output-fns)]
       (save-fn! layout))
     layout))
 
 (defn -main [path & args]
-  (let [{:keys [options exit-message ok?]}  (cli/parse path args)]
+  (let [{:keys [options exit-message ok?]} (cli/parse path args)]
     (if (some? exit-message)
       (cli/exit! (if ok? 0 1) exit-message)
-      ; TODO: bind options to dynamic var and run primary logic
-      options)))
+      (binding [cli/*options* options]
+        (clojure.pprint/pprint options)
+        (pack!)))))

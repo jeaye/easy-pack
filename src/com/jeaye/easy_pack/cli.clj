@@ -4,11 +4,15 @@
             [clojure.tools.cli :refer [parse-opts]]
             [me.raynes.fs :as fs]))
 
-; TODO: jpg, edn, json
-(def valid-outputs #{:png :css})
+; TODO: edn, json
+(def valid-outputs #{:image :css})
+(def valid-outputs-str (->> (map name valid-outputs)
+                            (string/join ",")))
 
 (s/def ::output (s/and keyword? valid-outputs))
 (s/def ::outputs (s/coll-of ::output))
+
+(def ^:dynamic *options* {})
 
 (defn valid-output-file?
   "Return whether the output file is in a valid place."
@@ -18,16 +22,16 @@
          (not (fs/directory? parent)))))
 
 (def cli-options
-  [["-o" "--outputs <OUTPUT1,OUTPUT2,...>" "Comma-separated list of output types"
+  [["-o" "--outputs <OUTPUT1,OUTPUT2,...>" (str "Comma-separated list of output types"
+                                                " (" valid-outputs-str ")")
+    :default "image"
     :parse-fn #(->> (string/split % #",")
                     (map keyword))
     :validate [#(s/valid? ::outputs %) (str "Invalid outputs. Valid outputs are: "
-                                            (->> (map name valid-outputs)
-                                                 (string/join ",")))]]
-   ; TODO: fn for generating these output file opts?
-   [nil "--png-file FILE" "Output PNG file"
+                                            valid-outputs-str)]]
+   [nil "--image-file FILE" "Output image file"
     :default "easy-pack.png"
-    :validate [valid-output-file? "Invalid PNG output file"]]
+    :validate [valid-output-file? "Invalid image output file"]]
    [nil "--css-file FILE" "Output CSS file"
     :default "easy-pack.css"
     :validate [valid-output-file? "Invalid CSS output file"]]
@@ -38,7 +42,7 @@
    ["-h" "--help"]])
 
 (defn usage [path summary]
-  (->> [(str "Usage: " path " outputs [options]")
+  (->> [(str "Usage: " path " [options] inputs")
         ""
         "Options:"
         summary]
@@ -48,7 +52,7 @@
   (string/join \newline errors))
 
 (defn parse [path cli-args]
-  (let [{:keys [options args errors summary]} (parse-opts cli-args cli-options)]
+  (let [{:keys [options arguments errors summary]} (parse-opts cli-args cli-options)]
     (cond
       (:help options)
       {:exit-message (usage path summary) :ok? true}
@@ -56,11 +60,12 @@
       errors
       {:exit-message (error-message errors) :ok? false}
 
-      (-> options :outputs empty?)
+      (or (-> options :outputs empty?)
+          (empty? arguments))
       {:exit-message (usage path summary) :ok? false}
 
       :else
-      {:options options})))
+      {:options (assoc options :inputs arguments)})))
 
 (defn exit! [status msg]
   (println msg)

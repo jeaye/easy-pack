@@ -21,7 +21,9 @@
   [["-o" "--outputs <OUTPUT1,OUTPUT2,...>" "Comma-separated list of output types"
     :parse-fn #(->> (string/split % #",")
                     (map keyword))
-    :validate [#(s/valid? ::outputs %) "Invalid outputs list"]]
+    :validate [#(s/valid? ::outputs %) (str "Invalid outputs. Valid outputs are: "
+                                            (->> (map name valid-outputs)
+                                                 (string/join ",")))]]
    [nil "--png-file FILE" "Output PNG file"
     :default "easy-pack.png"
     :validate [valid-output-file? "Invalid PNG output file"]]

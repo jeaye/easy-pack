@@ -59,4 +59,5 @@
   (let [{:keys [options exit-message ok?]}  (cli/parse args)]
     (if (some? exit-message)
       (cli/exit! (if ok? 0 1) exit-message)
+      ; TODO: bind options to dynamic var and run primary logic
       options)))

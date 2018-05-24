@@ -1,4 +1,4 @@
-(defproject com.jeaye/easy-pack "0.1.0-SNAPSHOT"
+(defproject com.jeaye/easy-pack "production"
   :description ""
   :url ""
   :license {:name "jank license"

@@ -15,11 +15,16 @@
 (def ^:dynamic *options* {})
 
 (defn valid-output-file?
-  "Return whether the output file is in a valid place."
+  "Returns whether the output file is in a valid place."
   [path]
   (let [parent (fs/parent path)]
     (and (fs/exists? parent)
          (not (fs/directory? parent)))))
+
+(defn valid-input-file?
+  "Returns whether the input file is readable."
+  [path]
+  (and (fs/exists? path) (fs/file? path)))
 
 (def cli-options
   [["-o" "--outputs <OUTPUT1,OUTPUT2,...>" (str "Comma-separated list of output types"
@@ -52,17 +57,27 @@
   (string/join \newline errors))
 
 (defn parse [path cli-args]
-  (let [{:keys [options arguments errors summary]} (parse-opts cli-args cli-options)]
+  (let [{:keys [options arguments errors summary]} (parse-opts cli-args cli-options)
+        invalid-inputs (filter (comp not valid-input-file?) arguments)]
     (cond
       (:help options)
-      {:exit-message (usage path summary) :ok? true}
+      {:exit-message (usage path summary)
+       :ok? true}
 
       errors
-      {:exit-message (error-message errors) :ok? false}
+      {:exit-message (error-message errors)
+       :ok? false}
 
       (or (-> options :outputs empty?)
           (empty? arguments))
-      {:exit-message (usage path summary) :ok? false}
+      {:exit-message (usage path summary)
+       :ok? false}
+
+      (not-empty invalid-inputs)
+      {:exit-message (str "Invalid input files: "
+                          (->> (map #(str "'" % "'") invalid-inputs)
+                               (string/join ", ")))
+       :ok? false}
 
       :else
       {:options (assoc options :inputs arguments)})))

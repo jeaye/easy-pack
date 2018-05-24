@@ -1,20 +1,27 @@
 (ns com.jeaye.easy-pack.cli
-  (:require [clojure.string :as string]
+  (:require [clojure.spec.alpha :as s]
+            [clojure.string :as string]
             [clojure.tools.cli :refer [parse-opts]]))
 
+; TODO: jpg, edn, json
+(def valid-outputs #{:png :css})
+
+(s/def ::output (s/and keyword? valid-outputs))
+(s/def ::outputs (s/coll-of ::output))
+
 (def cli-options
-  [["-p" "--port PORT" "Port number"
-    :default 80
-    :parse-fn #(Integer/parseInt %)
-    :validate [#(< 0 % 0x10000) "Must be a number between 0 and 65536"]]
-   ["-v" nil "Verbosity level"
+  [["-o" "--outputs <OUTPUT1,OUTPUT2,...>" "Comma-separated list of output types"
+    :parse-fn #(->> (string/split % #",")
+                    (map keyword))
+    :validate [#(s/valid? ::outputs %) "Invalid outputs list"]]
+   ["-v" nil "Verbosity level; may be specified multiple times to increase value"
     :id :verbosity
     :default 0
     :assoc-fn (fn [m k _] (update-in m [k] inc))]
    ["-h" "--help"]])
 
 (defn usage [options-summary]
-  (->> ["Usage: easy-pack [options]"
+  (->> ["Usage: easy-pack [options] outputs"
         ""
         "Options:"
         options-summary]
@@ -32,7 +39,7 @@
       errors
       {:exit-message (error-message errors) :ok? false}
 
-      (empty? args)
+      (-> options :outputs empty?)
       {:exit-message (usage summary) :ok? false}
 
       :else

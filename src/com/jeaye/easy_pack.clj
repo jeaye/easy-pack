@@ -43,7 +43,6 @@
           layout
           output-fns))
 
-; --outputs png,css,json,edn
 (defn TODO [args]
   (let [image-infos (->> (mapv fs/absolute args)
                          distinct

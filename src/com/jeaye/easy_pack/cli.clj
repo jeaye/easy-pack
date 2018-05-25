@@ -11,6 +11,7 @@
 
 (s/def ::output (s/and keyword? valid-outputs))
 (s/def ::outputs (s/coll-of ::output))
+(s/def ::image-quality (s/and number? #(< 0 % 1)))
 
 (def ^:dynamic *options* {})
 
@@ -37,6 +38,9 @@
    [nil "--image-file FILE" "Output image file"
     :default "easy-pack.png"
     :validate [valid-output-file? "Invalid image output file"]]
+   [nil "--image-quality NUM" "Quality of output image file (from 0.0 to 1.0)"
+    :default 1.0
+    :validate [#(s/valid? ::image-quality %) "Invalid image quality. Valid range is from 0.0 to 1.0 inclusive."]]
    [nil "--css-file FILE" "Output CSS file"
     :default "easy-pack.css"
     :validate [valid-output-file? "Invalid CSS output file"]]

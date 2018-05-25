@@ -13,5 +13,5 @@
 (defn save! [layout]
   (img/save (get-in layout [:output :image])
             (:image-file cli/*options*)
-            :quality 1.0 ; TODO: cli option
+            (:image-quality cli/*options*)
             :progressive nil))

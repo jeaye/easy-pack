@@ -1,5 +1,7 @@
 (ns com.jeaye.easy-pack.output.css
-  (:require [me.raynes.fs :as fs]))
+  (:require [me.raynes.fs :as fs]
+            [com.jeaye.easy-pack
+             [cli :as cli]]))
 
 ; TODO: Configure class
 (def base-class ".icon")
@@ -16,7 +18,7 @@
 
 (defn image->css [image]
   (str (:css-class image) " {\n"
-       "  background-position: " (:x image) "px " (:y image) "px;\n"
+       "  background-position: " (-> image :x -) "px " (-> image :y -) "px;\n"
        "  width: " (:width image) "px;\n"
        "  height: " (:height image) "px;\n"
        "}\n"))
@@ -32,5 +34,4 @@
         (assoc-in [:output :css] (build images)))))
 
 (defn save! [layout]
-  ; TODO: Configure output file
-  (spit "output.css" (get-in layout [:output :css])))
+  (spit (:css-file cli/*options*) (get-in layout [:output :css])))

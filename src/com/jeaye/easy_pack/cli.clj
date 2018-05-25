@@ -1,5 +1,6 @@
 (ns com.jeaye.easy-pack.cli
   (:require [clojure.spec.alpha :as s]
+            [clojure.edn :as edn]
             [clojure.string :as string]
             [clojure.tools.cli :refer [parse-opts]]
             [me.raynes.fs :as fs]))
@@ -20,7 +21,7 @@
   [path]
   (let [parent (fs/parent path)]
     (and (fs/exists? parent)
-         (not (fs/directory? parent)))))
+         (not (fs/directory? path)))))
 
 (defn valid-input-file?
   "Returns whether the input file is readable."
@@ -40,6 +41,7 @@
     :validate [valid-output-file? "Invalid image output file"]]
    [nil "--image-quality NUM" "Quality of output image file (from 0.0 to 1.0)"
     :default 1.0
+    :parse-fn edn/read-string
     :validate [#(s/valid? ::image-quality %) "Invalid image quality. Valid range is from 0.0 to 1.0 inclusive."]]
    [nil "--css-file FILE" "Output CSS file"
     :default "easy-pack.css"

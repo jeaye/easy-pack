@@ -43,8 +43,8 @@
           layout
           output-fns))
 
-(def output->fns {:png {:output (partial image/output :png)
-                        :save (partial image/save! :png)}
+(def output->fns {:image {:output image/output
+                          :save image/save!}
                   :css {:output css/output
                         :save css/save!}})
 

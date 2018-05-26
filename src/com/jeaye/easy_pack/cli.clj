@@ -33,7 +33,8 @@
                                                 " (" valid-outputs-str ")")
     :default "image"
     :parse-fn #(->> (string/split % #",")
-                    (map keyword))
+                    (map keyword)
+                    distinct)
     :validate [#(s/valid? ::outputs %) (str "Invalid outputs. Valid outputs are: "
                                             valid-outputs-str)]]
    [nil "--image-file FILE" "Output image file"

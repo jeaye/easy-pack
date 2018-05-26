@@ -12,6 +12,7 @@
   {:image (img/load-image path)
    :path path})
 
+; TODO: Smarter layout
 (defn build-layout [image-infos]
   (loop [infos image-infos
          x 0
@@ -65,5 +66,5 @@
     (if (some? exit-message)
       (cli/exit! (if ok? 0 1) exit-message)
       (binding [cli/*options* options]
-        (clojure.pprint/pprint options)
+        ;(clojure.pprint/pprint options)
         (pack!)))))

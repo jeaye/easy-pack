@@ -12,7 +12,6 @@
   :target-path "target/%s"
   :profiles {:dev {:plugins [[com.jakemccrary/lein-test-refresh "0.22.0"]
                              [lein-cloverage "1.0.10"]]
-                   :source-paths ["src/" "test/"]
                    :global-vars {*warn-on-reflection* true
                                  *assert* true}}
              :uberjar {:aot :all

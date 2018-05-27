@@ -50,10 +50,7 @@
                         :save css/save!}})
 
 (defn pack! []
-  (let [image-infos (->> (:inputs cli/*options*)
-                         (mapv fs/absolute)
-                         distinct
-                         (mapv load-image!))
+  (let [image-infos (mapv load-image! (:inputs cli/*options*))
         output-fns (map output->fns (:outputs cli/*options*))
         layout (-> (build-layout image-infos)
                    (generate-outputs (map :output output-fns)))]

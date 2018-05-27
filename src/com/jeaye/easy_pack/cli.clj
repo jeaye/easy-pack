@@ -48,6 +48,7 @@
    [nil "--css-file FILE" "Output CSS file"
     :default "easy-pack.css"
     :validate [valid-output-file? "Invalid CSS output file"]]
+   ; TODO: Use this
    ["-v" nil "Verbosity level; may be specified multiple times to increase value"
     :id :verbosity
     :default 0

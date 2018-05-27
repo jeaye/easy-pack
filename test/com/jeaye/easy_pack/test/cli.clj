@@ -32,19 +32,54 @@
 
   (testing "valid output"
     (let [{:keys [options]} (cli/parse easy-pack.test/cli-path
-                         ["-oimage" easy-pack.test/fake-png])]
-      (is (= (select-keys options [:outputs])
-             {:outputs [:image]}))))
+                         ["-oimage" (:1x1 easy-pack.test/images)])]
+      (is (= {:outputs [:image]}
+             (select-keys options [:outputs])))))
 
   (testing "multiple valid outputs"
     (let [{:keys [options]} (cli/parse easy-pack.test/cli-path
-                                       ["-oimage,css" easy-pack.test/fake-png])]
-      (is (= (select-keys options [:outputs])
-             {:outputs [:image :css]}))))
+                                       ["-oimage,css" (:1x1 easy-pack.test/images)])]
+      (is (= {:outputs [:image :css]}
+             (select-keys options [:outputs])))))
 
   (testing "duplicate valid outputs"
     (let [{:keys [options]} (cli/parse easy-pack.test/cli-path
                                        ["-oimage,css,image"
-                                        easy-pack.test/fake-png])]
-      (is (= (select-keys options [:outputs])
-             {:outputs [:image :css]})))))
+                                        (:1x1 easy-pack.test/images)])]
+      (is (= {:outputs [:image :css]}
+             (select-keys options [:outputs]))))))
+
+(deftest inputs
+  (testing "empty inputs"
+    (let [res (cli/parse easy-pack.test/cli-path ["-oimage"])]
+      (is (contains? res :exit-message))
+      (is (not (:ok? res)))))
+
+  (testing "valid input"
+    (let [{:keys [options]} (cli/parse easy-pack.test/cli-path
+                                       ["-oimage" (:1x1 easy-pack.test/images)])]
+      (is (= {:inputs [(:1x1 easy-pack.test/images)]}
+             (select-keys options [:inputs])))))
+
+  (testing "multiple valid inputs"
+    (let [{:keys [options]} (cli/parse easy-pack.test/cli-path
+                                       ["-oimage"
+                                        (:1x1 easy-pack.test/images)
+                                        (:100x10 easy-pack.test/images)])]
+      (is (= {:inputs [(:1x1 easy-pack.test/images)
+                       (:100x10 easy-pack.test/images)]}
+             (select-keys options [:inputs])))))
+
+  (testing "duplicate valid inputs"
+    (let [{:keys [options]} (cli/parse easy-pack.test/cli-path
+                                       ["-oimage"
+                                        (:1x1 easy-pack.test/images)
+                                        (:1x1 easy-pack.test/images)])]
+      (is (= {:inputs [(:1x1 easy-pack.test/images)]}
+             (select-keys options [:inputs])))))
+
+  (testing "invalid input"
+    (let [res (cli/parse easy-pack.test/cli-path
+                         ["-oimage" easy-pack.test/missing-image])]
+      (is (contains? res :exit-message))
+      (is (not (:ok? res))))))

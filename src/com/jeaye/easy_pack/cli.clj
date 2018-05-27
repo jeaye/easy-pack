@@ -3,6 +3,7 @@
             [clojure.edn :as edn]
             [clojure.string :as string]
             [clojure.tools.cli :refer [parse-opts]]
+            [medley.core :refer [distinct-by]]
             [me.raynes.fs :as fs]))
 
 ; TODO: edn, json
@@ -65,7 +66,11 @@
 
 (defn parse [path cli-args]
   (let [{:keys [options arguments errors summary]} (parse-opts cli-args cli-options)
-        invalid-inputs (filter (comp not valid-input-file?) arguments)]
+        ; Rule out duplicates by dictinction of absolute paths.
+        inputs (->> (mapv #(vector % (fs/absolute %)) arguments)
+                    (distinct-by second)
+                    (map first))
+        invalid-inputs (filter (comp not valid-input-file?) inputs)]
     (cond
       (:help options)
       {:exit-message (usage path summary)
@@ -76,7 +81,7 @@
        :ok? false}
 
       (or (-> options :outputs empty?)
-          (empty? arguments))
+          (empty? inputs))
       {:exit-message (usage path summary)
        :ok? false}
 
@@ -87,7 +92,7 @@
        :ok? false}
 
       :else
-      {:options (assoc options :inputs arguments)})))
+      {:options (assoc options :inputs inputs)})))
 
 (defn exit! [status msg]
   (println msg)

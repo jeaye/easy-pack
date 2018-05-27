@@ -6,12 +6,12 @@ os:
   - linux
 
 cache:
-  -apt
+  - apt
 
 script:
   - lein uberjar
   - lein test
 
 after_success:
-- lein cloverage --codecov
-- bash <(curl -s https://codecov.io/bash) -f target/coverage/codecov.json
+  - lein cloverage --codecov
+  - bash <(curl -s https://codecov.io/bash) -f target/coverage/codecov.json

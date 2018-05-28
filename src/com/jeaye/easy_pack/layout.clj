@@ -9,8 +9,8 @@
 ; TODO: Smarter layout
 (defn generate [image-infos]
   (loop [infos image-infos
-         x 0
-         y 0
+         x (long 0)
+         y (long 0)
          acc {:width 0
               :height 0
               :images []}]

@@ -13,6 +13,9 @@
                   :css {:output css/output
                         :save css/save!}})
 
+(defn outputs->fns [outputs]
+  (map output->fns outputs))
+
 (defn generate-outputs [layout output-fns]
   (reduce (fn [acc output-fn]
             (output-fn acc))
@@ -24,7 +27,7 @@
     (save-fn! layout)))
 
 (defn generate! [layout]
-  (let [output-fns (map output->fns (:outputs cli/*options*))
-        layout-with-outputs (generate-outputs (map :output output-fns))]
+  (let [output-fns (outputs->fns (:outputs cli/*options*))
+        layout-with-outputs (generate-outputs layout (map :output output-fns))]
     (generate-saves! layout-with-outputs (map :save output-fns))
     nil))

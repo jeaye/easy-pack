@@ -1,7 +1,8 @@
 (ns com.jeaye.easy-pack.test.cli
   (:require [clojure.test :refer :all]
-            [com.jeaye.easy-pack.test :as easy-pack.test]
-            [com.jeaye.easy-pack.cli :as cli]))
+            [com.jeaye.easy-pack
+             [cli :as cli]
+             [test :as easy-pack.test]]))
 
 (deftest help
   (testing "empty args"

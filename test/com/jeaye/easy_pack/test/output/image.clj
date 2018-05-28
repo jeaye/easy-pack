@@ -29,7 +29,7 @@
             saved-image (:image saved)
             saved-width (img/width saved-image)
             saved-height (img/height saved-image)]
-        ; TODO: These should ideally be the same, or comparable
-        ;(is (= (img/get-pixels saved-image) (img/get-pixels image)))
+        (is (= (into [] (img/get-pixels saved-image))
+               (into [] (img/get-pixels image))))
         (is (= 1 saved-width))
         (is (= 1 saved-height))))))

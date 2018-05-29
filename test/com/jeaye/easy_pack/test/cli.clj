@@ -84,3 +84,19 @@
                          ["-oimage" easy-pack.test/missing-image])]
       (is (contains? res :exit-message))
       (is (not (:ok? res))))))
+
+(deftest unit|valid-output-file?
+  (testing "non-existent"
+    (is (cli/valid-output-file? "this-does-not-exist")))
+  (testing "existent"
+    (is (cli/valid-output-file? "project.clj")))
+
+  (testing "nested with existent parent"
+    (is (cli/valid-output-file? "dev-resources/output")))
+  (testing "nested with non-existent parent"
+    (is (not (cli/valid-output-file? "bad-parent/output"))))
+
+  (testing "current directory"
+    (is (not (cli/valid-output-file? "."))))
+  (testing "other directory"
+    (is (not (cli/valid-output-file? "src")))))

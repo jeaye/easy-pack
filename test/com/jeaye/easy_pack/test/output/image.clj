@@ -9,7 +9,7 @@
              [test :as easy-pack.test
               :refer [with-generated-output with-saved-output]]]))
 
-(deftest generate
+(deftest integration|generate
   (testing "generating from single image"
     (with-generated-output {:inputs [(:1x1 easy-pack.test/images)]
                             :outputs [:image]}
@@ -20,7 +20,7 @@
         (is (= 1 width))
         (is (= 1 height))))))
 
-(deftest save
+(deftest integration|save
   (testing "saving from single image"
     (with-saved-output {:inputs [(:1x1 easy-pack.test/images)]
                         :outputs [:image]}

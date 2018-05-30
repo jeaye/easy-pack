@@ -4,7 +4,7 @@
              [cli :as cli]
              [test :as easy-pack.test]]))
 
-(deftest help
+(deftest integration|help
   (testing "empty args"
     (let [res (cli/parse easy-pack.test/cli-path [])]
       (is (contains? res :exit-message))
@@ -20,7 +20,7 @@
       (is (contains? res :exit-message))
       (is (:ok? res)))))
 
-(deftest outputs
+(deftest integration|outputs
   (testing "empty outputs"
     (let [res (cli/parse easy-pack.test/cli-path ["-o,"])]
       (is (contains? res :exit-message))
@@ -50,7 +50,7 @@
       (is (= {:outputs [:image :css]}
              (select-keys options [:outputs]))))))
 
-(deftest inputs
+(deftest integration|inputs
   (testing "empty inputs"
     (let [res (cli/parse easy-pack.test/cli-path ["-oimage"])]
       (is (contains? res :exit-message))

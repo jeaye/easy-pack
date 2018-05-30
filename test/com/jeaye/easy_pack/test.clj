@@ -1,5 +1,6 @@
 (ns com.jeaye.easy-pack.test
   (:require [clojure.test :refer :all]
+            [orchestra.spec.test :as st]
             [me.raynes.fs :as fs]
             [com.jeaye.easy-pack
              [cli :as cli]
@@ -14,6 +15,12 @@
              :10x100 (str resource-path "10x100.png")
              :100x100 (str resource-path "100x100.png")})
 (def missing-image "this/will/likely/never/exist.png")
+
+(defn enable-instrumentation! [f]
+  (println "Instrumenting all fns")
+  (st/instrument)
+  (f))
+(use-fixtures :once enable-instrumentation!)
 
 (defn temp-file-for-output [output]
   (let [suffix (case output

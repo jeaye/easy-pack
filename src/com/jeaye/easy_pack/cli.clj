@@ -3,6 +3,7 @@
             [clojure.edn :as edn]
             [clojure.string :as string]
             [clojure.tools.cli :refer [parse-opts]]
+            [orchestra.core :refer [defn-spec]]
             [medley.core :refer [distinct-by]]
             [me.raynes.fs :as fs]))
 
@@ -15,18 +16,20 @@
 (s/def ::outputs (s/coll-of ::output))
 (s/def ::image-quality (s/and number? #(< 0 % 1)))
 
+(s/def ::path (s/and string? not-empty))
+
 (def ^:dynamic *options* {})
 
-(defn valid-output-file?
+(defn-spec valid-output-file? boolean?
   "Returns whether the output file is in a valid place."
-  [path]
+  [path ::path]
   (let [parent (fs/parent path)]
     (and (fs/exists? parent)
          (not (fs/directory? path)))))
 
-(defn valid-input-file?
+(defn-spec valid-input-file? boolean?
   "Returns whether the input file is readable."
-  [path]
+  [path ::path]
   (and (fs/exists? path) (fs/file? path)))
 
 (def cli-options

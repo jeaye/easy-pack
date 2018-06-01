@@ -16,7 +16,9 @@
 (s/def ::outputs (s/coll-of ::output))
 (s/def ::image-quality (s/and number? #(< 0 % 1)))
 
-(s/def ::path (s/and string? not-empty))
+(s/def ::non-empty-string (s/and string? not-empty))
+(s/def ::path ::non-empty-string)
+(s/def ::summary ::non-empty-string)
 
 (def ^:dynamic *options* {})
 
@@ -58,14 +60,16 @@
     :assoc-fn (fn [m k _] (update-in m [k] inc))]
    ["-h" "--help"]])
 
-(defn usage [path summary]
+(defn-spec usage ::non-empty-string
+  [path ::path, summary ::summary]
   (->> [(str "Usage: " path " [options] inputs")
         ""
         "Options:"
         summary]
        (string/join \newline)))
 
-(defn error-message [errors]
+(defn-spec error-message string?
+  [errors (s/coll-of ::non-empty-string)]
   (string/join \newline errors))
 
 (defn parse [path cli-args]

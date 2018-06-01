@@ -19,6 +19,16 @@
 (s/def ::non-empty-string (s/and string? not-empty))
 (s/def ::path ::non-empty-string)
 (s/def ::summary ::non-empty-string)
+(s/def ::args (s/coll-of ::non-empty-string))
+
+(s/def ::exit-status integer?)
+(s/def ::exit-message ::non-empty-string)
+
+(s/def ::ok? boolean?)
+(s/def ::options (s/keys :req-un []))
+(s/def ::parse-state (s/or :error (s/keys :req-un [::exit-message
+                                                   ::ok?])
+                           :success (s/keys :req-un [::options])))
 
 (def ^:dynamic *options* {})
 
@@ -72,7 +82,8 @@
   [errors (s/coll-of ::non-empty-string)]
   (string/join \newline errors))
 
-(defn parse [path cli-args]
+(defn-spec parse ::parse-state
+  [path ::path, cli-args ::args]
   (let [{:keys [options arguments errors summary]} (parse-opts cli-args cli-options)
         ; Rule out duplicates by dictinction of absolute paths.
         inputs (->> (mapv #(vector % (fs/absolute %)) arguments)
@@ -102,6 +113,7 @@
       :else
       {:options (assoc options :inputs inputs)})))
 
-(defn exit! [status msg]
+(defn-spec exit! nil?
+  [status ::exit-status msg ::exit-message]
   (println msg)
   (System/exit status))

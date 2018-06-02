@@ -5,7 +5,8 @@
             [clojure.tools.cli :refer [parse-opts]]
             [orchestra.core :refer [defn-spec]]
             [medley.core :refer [distinct-by]]
-            [me.raynes.fs :as fs]))
+            [me.raynes.fs :as fs]
+            [com.jeaye.easy-pack.util :as util]))
 
 ; TODO: edn, json
 (def valid-outputs #{:image :css})
@@ -16,13 +17,11 @@
 (s/def ::outputs (s/coll-of ::output))
 (s/def ::image-quality (s/and number? #(< 0 % 1)))
 
-(s/def ::non-empty-string (s/and string? not-empty))
-(s/def ::path ::non-empty-string)
-(s/def ::summary ::non-empty-string)
-(s/def ::args (s/coll-of ::non-empty-string))
+(s/def ::summary ::util/non-empty-string)
+(s/def ::args (s/coll-of ::util/non-empty-string))
 
 (s/def ::exit-status integer?)
-(s/def ::exit-message ::non-empty-string)
+(s/def ::exit-message ::util/non-empty-string)
 
 (s/def ::ok? boolean?)
 (s/def ::options (s/keys :req-un []))
@@ -34,14 +33,14 @@
 
 (defn-spec valid-output-file? boolean?
   "Returns whether the output file is in a valid place."
-  [path ::path]
+  [path ::util/path]
   (let [parent (fs/parent path)]
     (and (fs/exists? parent)
          (not (fs/directory? path)))))
 
 (defn-spec valid-input-file? boolean?
   "Returns whether the input file is readable."
-  [path ::path]
+  [path ::util/path]
   (and (fs/exists? path) (fs/file? path)))
 
 (def cli-options
@@ -70,8 +69,8 @@
     :assoc-fn (fn [m k _] (update-in m [k] inc))]
    ["-h" "--help"]])
 
-(defn-spec usage ::non-empty-string
-  [path ::path, summary ::summary]
+(defn-spec usage ::util/non-empty-string
+  [path ::util/path, summary ::summary]
   (->> [(str "Usage: " path " [options] inputs")
         ""
         "Options:"
@@ -79,11 +78,11 @@
        (string/join \newline)))
 
 (defn-spec error-message string?
-  [errors (s/coll-of ::non-empty-string)]
+  [errors (s/coll-of ::util/non-empty-string)]
   (string/join \newline errors))
 
 (defn-spec parse ::parse-state
-  [path ::path, cli-args ::args]
+  [path ::util/path, cli-args ::args]
   (let [{:keys [options arguments errors summary]} (parse-opts cli-args cli-options)
         ; Rule out duplicates by dictinction of absolute paths.
         inputs (->> (mapv #(vector % (fs/absolute %)) arguments)

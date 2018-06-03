@@ -1,5 +1,7 @@
 (ns com.jeaye.easy-pack.output
-  (:require [mikera.image.core :as img]
+  (:require [clojure.spec.alpha :as s]
+            [orchestra.core :refer [defn-spec]]
+            [mikera.image.core :as img]
             [me.raynes.fs :as fs]
             [com.jeaye.easy-pack
              [cli :as cli]
@@ -13,7 +15,15 @@
                   :css {:output css/output
                         :save css/save!}})
 
-(defn outputs->fns [outputs]
+(s/def ::type (s/and keyword? (into #{} (keys output->fns))))
+(s/def ::output fn?)
+(s/def ::save fn?)
+(s/def ::fn (s/keys :req-un [::output
+                              ::save]))
+(s/def ::fns (s/coll-of ::fns))
+
+(defn-spec outputs->fns ::fns
+  [outputs (s/coll-of ::type)]
   (map output->fns outputs))
 
 (defn generate-outputs [layout output-fns]

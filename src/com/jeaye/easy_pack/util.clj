@@ -3,3 +3,4 @@
 
 (s/def ::non-empty-string (s/and string? not-empty))
 (s/def ::path ::non-empty-string)
+(s/def ::image #(instance? java.awt.image.BufferedImage %))

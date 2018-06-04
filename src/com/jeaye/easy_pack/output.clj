@@ -20,7 +20,7 @@
 (s/def ::save fn?)
 (s/def ::fn (s/keys :req-un [::output
                               ::save]))
-(s/def ::fns (s/coll-of ::fns))
+(s/def ::fns (s/coll-of ::fn))
 
 (defn-spec outputs->fns ::fns
   [outputs (s/coll-of ::type)]

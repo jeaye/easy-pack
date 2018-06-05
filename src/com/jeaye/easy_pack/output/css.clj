@@ -33,5 +33,5 @@
     (-> (assoc layout :images images)
         (assoc-in [:output :css] (build images)))))
 
-(defn save! [layout]
-  (spit (:css-file cli/*options*) (get-in layout [:output :css])))
+(defn save! [outputs]
+  (spit (:css-file cli/*options*) (get-in outputs [:output :css])))

@@ -10,8 +10,8 @@
         (img/set-pixels sub-image (img/get-pixels image))))
     (assoc-in layout [:output :image] output-image)))
 
-(defn save! [layout]
-  (img/save (get-in layout [:output :image])
+(defn save! [outputs]
+  (img/save (get-in outputs [:output :image])
             (:image-file cli/*options*)
             :quality (:image-quality cli/*options*)
             :progressive nil))

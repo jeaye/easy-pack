@@ -1,7 +1,6 @@
 (ns com.jeaye.easy-pack.output
   (:require [clojure.spec.alpha :as s]
             [orchestra.core :refer [defn-spec]]
-            [mikera.image.core :as img]
             [me.raynes.fs :as fs]
             [com.jeaye.easy-pack
              [cli :as cli]

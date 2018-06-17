@@ -5,6 +5,7 @@
             [com.jeaye.easy-pack
              [cli :as cli]
              [layout :as layout]
+             [input :as input]
              [output :as output]]))
 
 (def cli-path "easy-pack-test")
@@ -39,15 +40,15 @@
         args (-> (into ["-o" outputs-str] output-files)
                  (into (:inputs config)))]
     `(binding [~'cli/*options* (:options (cli/parse ~cli-path ~args))]
-       (let [~'image-infos ~'(mapv input/load-image! (:inputs cli/*options*))
-             ~'layout ~'(layout/generate image-infos)]
+       (let [~'image-infos (mapv ~input/load-image! ~'(:inputs cli/*options*))
+             ~'layout (~layout/generate ~'image-infos)]
          ~@body))))
 
 (defmacro with-generated-output [config & body]
   `(with-layout ~config
-     (let [~'output-fns ~'(output/outputs->fns (:outputs cli/*options*))
-           ~'layout-with-outputs ~'(output/generate-outputs layout
-                                                            (map :output output-fns))]
+     (let [~'output-fns (~output/outputs->fns ~'(:outputs cli/*options*))
+           ~'output-state (~output/generate-outputs ~'layout
+                                                    ~'(map :output-fn output-fns))]
        ~@body)))
 
 (defmacro with-saved-output [config & body]
@@ -56,5 +57,5 @@
                           (into {}))]
     `(with-generated-output ~(assoc config :output-files output-files)
        (let [~'output-files ~output-files]
-         (output/generate-saves! ~'layout-with-outputs ~'(map :save output-fns))
+         (~output/generate-saves! ~'output-state ~'(map :save-fn output-fns))
          ~@body))))

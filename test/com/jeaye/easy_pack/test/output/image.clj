@@ -7,13 +7,15 @@
              [layout :as layout]
              [output :as output]
              [test :as easy-pack.test
-              :refer [with-generated-output with-saved-output]]]))
+              :refer [with-generated-output with-saved-output]]]
+            [com.jeaye.easy-pack.output
+             [image :as image]]))
 
 (deftest integration|generate
   (testing "generating from single image"
     (with-generated-output {:inputs [(:1x1 easy-pack.test/images)]
                             :outputs [:image]}
-      (let [image (get-in layout-with-outputs [:output :image])
+      (let [image (get-in output-state [:output ::image/output])
             width (img/width image)
             height (img/height image)]
         (is (some? image))
@@ -24,7 +26,7 @@
   (testing "saving from single image"
     (with-saved-output {:inputs [(:1x1 easy-pack.test/images)]
                         :outputs [:image]}
-      (let [image (get-in layout-with-outputs [:output :image])
+        (let [image (get-in output-state [:output ::image/output])
             saved (input/load-image! (:image output-files))
             saved-image (:image saved)
             saved-width (img/width saved-image)

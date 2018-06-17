@@ -1,7 +1,11 @@
 (ns com.jeaye.easy-pack.output.css
-  (:require [me.raynes.fs :as fs]
+  (:require [clojure.spec.alpha :as s]
+            [me.raynes.fs :as fs]
             [com.jeaye.easy-pack
-             [cli :as cli]]))
+             [cli :as cli]
+             [util :as util]]))
+
+(s/def ::output ::util/non-empty-string)
 
 ; TODO: Configure class
 (def base-class ".icon")
@@ -26,12 +30,12 @@
 (defn build [images]
   (apply str base-output (map image->css images)))
 
-(defn output [layout]
+(defn output [output-state]
   ; TODO: Files in different dirs with the same name will have the same class
   (let [images (mapv #(assoc % :css-class (build-class-name %))
-                     (:images layout))]
-    (-> (assoc layout :images images)
-        (assoc-in [:output :css] (build images)))))
+                     (-> output-state :layout :images))]
+    (-> (assoc-in output-state [:layout :images] images)
+        (assoc-in [:output ::output] (build images)))))
 
-(defn save! [outputs]
-  (spit (:css-file cli/*options*) (get-in outputs [:output :css])))
+(defn save! [output-state]
+  (spit (:css-file cli/*options*) (get-in output-state [:output :css])))

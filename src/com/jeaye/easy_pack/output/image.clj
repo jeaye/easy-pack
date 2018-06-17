@@ -1,17 +1,22 @@
 (ns com.jeaye.easy-pack.output.image
-  (:require [mikera.image.core :as img]
+  (:require [clojure.spec.alpha :as s]
+            [mikera.image.core :as img]
             [com.jeaye.easy-pack
-             [cli :as cli]]))
+             [cli :as cli]
+             [util :as util]]))
 
-(defn output [layout]
-  (let [output-image (img/new-image (:width layout) (:height layout))]
+(s/def ::output (s/keys :req-un [::util/image]))
+
+(defn output [output-state]
+  (let [layout (:layout output-state)
+        output-image (img/new-image (:width layout) (:height layout))]
     (doseq [{:keys [image x y width height]} (:images layout)]
       (let [sub-image (img/sub-image output-image x y width height)]
         (img/set-pixels sub-image (img/get-pixels image))))
-    (assoc-in layout [:output :image] output-image)))
+    (assoc-in output-state [:output ::output] output-image)))
 
-(defn save! [outputs]
-  (img/save (get-in outputs [:output :image])
+(defn save! [output-state]
+  (img/save (get-in output-state [:output ::output])
             (:image-file cli/*options*)
             :quality (:image-quality cli/*options*)
             :progressive nil))

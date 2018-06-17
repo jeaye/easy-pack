@@ -10,37 +10,44 @@
              [image :as image]
              [css :as css]]))
 
-(def output->fns {:image {:output image/output
-                          :save image/save!}
-                  :css {:output css/output
-                        :save css/save!}})
+(def output->fns {:image {:output-fn image/output
+                          :save-fn image/save!}
+                  :css {:output-fn css/output
+                        :save-fn css/save!}})
 
 (s/def ::type (s/and keyword? (into #{} (keys output->fns))))
-(s/def ::output fn?)
-(s/def ::save fn?)
-(s/def ::fn (s/keys :req-un [::output
-                             ::save]))
+(s/def ::output-fn fn?)
+(s/def ::save-fn fn?)
+(s/def ::fn (s/keys :req-un [::output-fn
+                             ::save-fn]))
 (s/def ::fns (s/coll-of ::fn))
+
+(s/def ::output (s/keys :opt [::image/output
+                              ::css/output]))
+(s/def ::state (s/keys :req-un [::layout
+                                ::output]))
 
 (defn-spec outputs->fns ::fns
   [outputs (s/coll-of ::type)]
   (map output->fns outputs))
 
-(defn-spec generate-outputs map? ; TODO
-  [layout ::layout/info, output-fns (s/coll-of ::output)]
+(defn-spec generate-outputs ::state
+  [layout ::layout/info, output-fns (s/coll-of ::output-fn)]
   (reduce (fn [acc output-fn]
             (output-fn acc))
-          layout
+          {:layout layout
+           :output {}}
           output-fns))
 
 (defn-spec generate-saves! nil?
-  [outputs map?, output-fns (s/coll-of ::save)]
+  [output-state ::state, output-fns (s/coll-of ::save)]
   (doseq [save-fn! output-fns]
-    (save-fn! outputs)))
+    (save-fn! output-state)))
 
 (defn-spec generate! nil?
   [layout ::layout/info]
   (let [output-fns (outputs->fns (:outputs cli/*options*))
-        layout-with-outputs (generate-outputs layout (map :output output-fns))]
-    (generate-saves! layout-with-outputs (map :save output-fns))
+        output-state (generate-outputs layout
+                                       (map :output-fn output-fns))]
+    (generate-saves! output-state (map :save-fn output-fns))
     nil))

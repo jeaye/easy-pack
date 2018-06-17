@@ -11,7 +11,8 @@
                  [net.mikera/imagez "0.12.0"]]
   :main ^:skip-aot com.jeaye.easy-pack
   :target-path "target/%s"
-  :profiles {:dev {:plugins [[com.jakemccrary/lein-test-refresh "0.22.0"]
+  :profiles {:dev {:source-paths ["src/" "test/"]
+                   :plugins [[com.jakemccrary/lein-test-refresh "0.22.0"]
                              [lein-cloverage "1.0.10"]]
                    :global-vars {*warn-on-reflection* true
                                  *assert* true}}

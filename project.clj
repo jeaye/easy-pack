@@ -12,8 +12,8 @@
   :main ^:skip-aot com.jeaye.easy-pack
   :target-path "target/%s"
   :profiles {:dev {:source-paths ["src/" "test/"]
-                   :plugins [[com.jakemccrary/lein-test-refresh "0.22.0"]
-                             [lein-cloverage "1.0.10"]]
+                   :plugins [[com.jakemccrary/lein-test-refresh "0.23.0"]
+                             [lein-cloverage "1.0.11"]]
                    :global-vars {*warn-on-reflection* true
                                  *assert* true}}
              :uberjar {:aot :all
